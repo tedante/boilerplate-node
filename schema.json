@@ -1,0 +1,10 @@
+[
+  {
+    "name": "User",
+    "attributes": {
+      "name": "string",
+      "email": "string",
+      "birth_date": "date"
+    }
+  }
+]

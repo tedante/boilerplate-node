@@ -35,3 +35,31 @@ if(argv._[0] === "install") {
     })
   });
 }
+
+if(argv._[0] === "generate") {
+  console.log(`installing express, ejs, sequelize`)
+  exec('npm install --save express ejs sequelize', (error, stdout, stderr) => {
+    if (error) {
+      console.log(`error: ${error.message}`);
+      return;
+    }
+    if (stderr) {
+        console.log(`stderr: ${stderr}`);
+        return;
+    }
+    console.log("-> installing express, ejs, sequelize has done")
+
+    console.log(`installing sequelize-cli nodemon`)
+    exec('npm install --save-dev sequelize-cli nodemon', (error, stdout, stderr) => {
+      if (error) {
+        console.log(`error: ${error.message}`);
+        return;
+      }
+      if (stderr) {
+          console.log(`stderr: ${stderr}`);
+          return;
+      }
+      console.log("-> installing sequelize-cli, nodemon has done")
+    })
+  });
+}
