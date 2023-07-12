@@ -4,7 +4,6 @@ import routes from "./routes/index.js";
 import { connectDB } from "./config/database.js";
 import { PORT } from "./config/app.js";
 import cors from "cors";
-import schedule from "#schedule/index";
 
 const app = express();
 
@@ -15,7 +14,6 @@ app.use("/", routes);
 
 connectDB()
   .then(() => {
-    schedule();
     app.listen(PORT, () => {
       console.log("server is running", PORT);
     });
