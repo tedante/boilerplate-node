@@ -1,7 +1,6 @@
 const router = require("express").Router()
+const Controller = require('../controllers/controller');
 
-router.get("/", (req, res) => {
-  res.send("nicee")
-})
+router.get("/", Controller.home)
 
 module.exports = router
