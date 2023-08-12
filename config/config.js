@@ -6,7 +6,7 @@ const sequelizeConfig = {
     port: process.env.DB_PORT || "5432",
     username: process.env.DB_USERNAME || "postgres",
     password: process.env.DB_PASSWORD || "postgres",
-    database: process.env.DB_NAME || "db-dummy",
+    database: process.env.DB_NAME || "development-db",
     dialect: process.env.DB_DRIVER || "postgres",
     logging: process.env.DB_LOGGING || false,
   }
