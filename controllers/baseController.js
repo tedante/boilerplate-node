@@ -1,3 +1,5 @@
+const responseHelper = require('../helpers/response')
+
 class BaseController {
   constructor(model) {
     this.model = model
@@ -6,11 +8,12 @@ class BaseController {
   list = async (req, res, next) => {
     try {
       const data = await this.model.findAll()
-      
-      res.status(200).json(data)
+
+      let responseSuccess = responseHelper.success(data)
+
+      res.status(responseSuccess.code).json(responseSuccess)
     } catch (error) {
       next(error)
-      // res.status(500).json(error)
     }
   }
 }
