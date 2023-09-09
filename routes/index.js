@@ -1,12 +1,10 @@
 const fs = require('fs');
 const path = require('path');
 const router = require("express").Router()
-const Controller = require('../controllers/controller');
 
 router.get("/ping", (req, res) => {
   res.send("ping!")
 })
-router.get("/", Controller.home)
 
 // Iterate through the files in the 'routes' folder
 console.log(fs.readdirSync(__dirname), ">");
