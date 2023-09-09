@@ -1,4 +1,5 @@
 const responseHelper = require('../helpers/response')
+const paginate = require('../helpers/paginate')
 
 class BaseController {
   constructor(model) {
@@ -6,13 +7,16 @@ class BaseController {
   }
 
   list = async (req, res, next) => {
+    let { page, limit, search } = req.query
+
     try {
-      const data = await this.model.findAll()
-
-      let responseSuccess = responseHelper.success(data)
-
+      const data = await paginate(this.model, page, limit, search)
+      
+      let responseSuccess = responseHelper.success(data.data, 'Data successfully retrieved', 200, data.meta)
+      
       res.status(responseSuccess.code).json(responseSuccess)
     } catch (error) {
+      console.log(error);
       next(error)
     }
   }
