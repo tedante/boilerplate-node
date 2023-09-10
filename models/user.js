@@ -14,6 +14,11 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   User.init({
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: () => uuidv4(), // Use the uuid library to generate a default UUID
+      primaryKey: true,
+    },
     name: DataTypes.STRING,
     email: DataTypes.STRING,
     password: DataTypes.STRING,
