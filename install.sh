@@ -1,6 +1,5 @@
 #!/bin/sh
 
-
 echo "Checking Installation Requirements"
 
 if ! command -v git >/dev/null; then
@@ -23,7 +22,7 @@ fi
 
 echo "Installation Requirements met"
 echo "Installing boilerplate-node"
-git clone git@github.com:tedante/boilerplate-node.git
+git clone git@github.com:tedante/boilerplate-node.git 
 cd boilerplate-node 
 
 echo "Installing dependencies"
