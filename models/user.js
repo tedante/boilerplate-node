@@ -2,6 +2,9 @@
 const {
   Model
 } = require('sequelize');
+const { hash, compare } = require("../helpers/bcrypt");
+const { generateJWT } = require("../helpers/jwt");
+
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     /**
@@ -12,6 +15,18 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
     }
+
+    validPassword(password) {
+      return compare(password, this.password);
+    }
+
+    generateToken() {
+      return generateJWT({
+        id: this.id,
+        email: this.email,
+      });
+    }
+
   }
   User.init({
     id: {

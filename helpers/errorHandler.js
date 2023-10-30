@@ -21,6 +21,7 @@ module.exports = (err, req, res, next) => {
       break;
     default:
   }
+  
   const response = responseHelper.error(null, error.message, error.code);
   res.status(response.code).json(response);
 };
