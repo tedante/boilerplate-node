@@ -1,13 +1,13 @@
-const { hash, compare } = require("../helpers/bcrypt");
 const { User } = require("../models/index");
 const BaseController = require("./baseController");
+const responseHelper = require('../helpers/response')
 
 class AuthController extends BaseController{
   constructor(){
     super(User);
   }
 
-  async login(req, res){
+  login = async (req, res, next) => {
     try {
       const { email, password } = req.body;
       const user = await this.model.findOne({
@@ -15,31 +15,36 @@ class AuthController extends BaseController{
           email,
         },
       });
+
       if (!user) {
-        return res.status(401).json({
+        throw ({
+          name: "NOT_FOUND",
           message: "Email not found",
         });
       }
+
       const validPassword = await user.validPassword(password);
+
       if (!validPassword) {
-        return res.status(401).json({
+        throw ({
+          name: "BAD_REQUEST",
           message: "Invalid Password",
         });
       }
-      const token = user.generateJWT();
-      return res.status(200).json({
-        message: "User logged in successfully",
-        token,
-      });
+
+      const response = responseHelper.success({
+        email: user.email,
+        token: user.generateToken()
+      }, 'User logged in successfully', 200)
+
+      return res.status(response.code).json(response);
     } catch (error) {
-      return res.status(500).json({
-        message: "Error",
-        error: error.message,
-      });
+      console.log(error);
+      next(error);
     }
   }
 
-  async register(req, res){
+  register = async (req, res, next) => {
     try {
       const { email, password } = req.body;
 
@@ -60,3 +65,5 @@ class AuthController extends BaseController{
     }
   }
 }
+
+module.exports = AuthController;
