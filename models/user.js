@@ -4,6 +4,7 @@ const {
 } = require('sequelize');
 const { hash, compare } = require("../helpers/bcrypt");
 const { generateJWT } = require("../helpers/jwt");
+const { v4: uuidv4 } = require('uuid');
 
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
@@ -38,8 +39,14 @@ module.exports = (sequelize, DataTypes) => {
     email: DataTypes.STRING,
     password: DataTypes.STRING,
     email_verified_at: DataTypes.DATE,
+    RoleId: DataTypes.UUID,
     is_active: DataTypes.BOOLEAN
   }, {
+    hooks: {
+      beforeCreate: (user) => {
+        user.password = hash(user.password);
+      },
+    },
     sequelize,
     modelName: 'User',
     paranoid: true,

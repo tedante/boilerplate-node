@@ -1,6 +1,6 @@
-const { User } = require("../models/index");
+const { User, Role } = require("../models/index");
 const BaseController = require("./baseController");
-const responseHelper = require('../helpers/response')
+const responseHelper = require('../helpers/response');
 
 class AuthController extends BaseController{
   constructor(){
@@ -39,29 +39,46 @@ class AuthController extends BaseController{
 
       return res.status(response.code).json(response);
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }
 
   register = async (req, res, next) => {
     try {
-      const { email, password } = req.body;
+      const { name, email, password, role } = req.body;
+
+      const findRole = await Role.findOne({
+        where: {
+          name: role || "user",
+        },
+      });
+
+      if (!findRole) {
+        throw ({
+          name: "NOT_FOUND",
+          message: "Role not found",
+        });
+      }
 
       const user = await this.model.create({
+        name,
         email,
-        password: hash(password),
+        password,
+        RoleId: findRole.id
       });
-      const token = user.generateJWT();
-      return res.status(201).json({
-        message: "User registered successfully",
-        token,
-      });
+      
+      const token = user.generateToken();
+
+      const response = responseHelper.success({
+        email: user.email,
+        token
+      }, 'User registered successfully', 201)
+
+      
+      return res.status(response.code).json(response);
     } catch (error) {
-      return res.status(500).json({
-        message: "Error",
-        error: error.message,
-      });
+      console.log(error);
+      next(error);
     }
   }
 }
