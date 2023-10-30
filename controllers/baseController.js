@@ -8,9 +8,10 @@ class BaseController {
 
   list = async (req, res, next) => {
     let { page, limit, search } = req.query
+    let params = {}
 
     try {
-      const data = await paginate(this.model, page, limit, search)
+      const data = await paginate(this.model, page, limit, params)
       
       let responseSuccess = responseHelper.success(data.data, 'Data successfully retrieved', 200, data.meta)
       
