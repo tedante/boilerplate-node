@@ -15,18 +15,21 @@ class BaseController {
     return []
   }
 
-  get include() {
+  get includable() {
     return []
   }
 
   list = async (req, res, next) => {
-    let { page, limit, filter, orderby, ordertype } = req.query
+    let { page, limit, filter, orderby, ordertype, include } = req.query
 
     try {
       let params = {
         order: this.getOrder(orderby, ordertype),
-        where: this.getFilter(filter)
+        where: this.getFilter(filter),
+        include: this.getInclude(include)
       }
+
+      console.log(params, ">>");
 
       const data = await paginate(this.model, page, limit, params)
       
@@ -86,8 +89,6 @@ class BaseController {
   getFilter = (filter) => {
     let sequelizeFilter = {}
 
-    console.log(this.filterable, ">");
-
     if (filter) {
       for (const key in filter) {
         if(this.filterable.includes(key)) {
@@ -113,6 +114,25 @@ class BaseController {
     }
 
     return order
+  }
+  
+  getInclude = (include) => {
+    let sequelizeInclude = []
+    
+    if (include && include.length > 0) {
+      include.forEach(element => {
+        
+        this.includable.forEach(item => {
+          if (item.name === element) {
+            sequelizeInclude.push({
+              model: item
+            })
+          }
+        })
+      });
+    }
+
+    return sequelizeInclude
   }
 }
 
