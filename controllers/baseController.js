@@ -71,18 +71,15 @@ class BaseController {
     }
   }
 
-  // get query string filter and return sequelize filter
   getFilter = (filter) => {
     let sequelizeFilter = {}
 
     if (filter) {
-      // filter is object with name column and filter value, format to filter ilike %value%
       for (const key in filter) {
         sequelizeFilter[key] = {
           [Op.iLike]: `%${filter[key]}%`
         }
       } 
-
     }
 
     return sequelizeFilter
