@@ -7,8 +7,11 @@ class BaseController {
   }
 
   list = async (req, res, next) => {
-    let { page, limit, search } = req.query
-    let params = {}
+    let { page, limit, filter, orderby, ordertype } = req.query
+
+    let params = {
+      order: this.getOrder(orderby, ordertype)
+    }
 
     try {
       const data = await paginate(this.model, page, limit, params)
@@ -64,6 +67,33 @@ class BaseController {
     } catch (error) {
       next(error)
     }
+  }
+
+  // get query string filter and return sequelize filter
+  getFilter = (filter) => {
+    let sequelizeFilter = {}
+
+    if (filter) {
+      let filterArray = filter.split(',')
+
+      filterArray.forEach((item) => {
+        let filterItem = item.split(':')
+
+        sequelizeFilter[filterItem[0]] = filterItem[1]
+      })
+    }
+
+    return sequelizeFilter
+  }
+
+  getOrder = (orderby, ordertype) => {
+    let order = []
+
+    if (orderby && ordertype) {
+      order.push([orderby, ordertype])
+    }
+
+    return order
   }
 }
 
