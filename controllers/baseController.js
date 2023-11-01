@@ -7,15 +7,27 @@ class BaseController {
     this.model = model
   }
 
+  get filterable() {
+    return []
+  }
+
+  get sortable() {
+    return []
+  }
+
+  get include() {
+    return []
+  }
+
   list = async (req, res, next) => {
     let { page, limit, filter, orderby, ordertype } = req.query
 
-    let params = {
-      order: this.getOrder(orderby, ordertype),
-      where: this.getFilter(filter)
-    }
-
     try {
+      let params = {
+        order: this.getOrder(orderby, ordertype),
+        where: this.getFilter(filter)
+      }
+
       const data = await paginate(this.model, page, limit, params)
       
       let responseSuccess = responseHelper.success(data.data, 'Data successfully retrieved', 200, data.meta)
@@ -74,11 +86,15 @@ class BaseController {
   getFilter = (filter) => {
     let sequelizeFilter = {}
 
+    console.log(this.filterable, ">");
+
     if (filter) {
       for (const key in filter) {
-        sequelizeFilter[key] = {
-          [Op.iLike]: `%${filter[key]}%`
-        }
+        if(this.filterable.includes(key)) {
+          sequelizeFilter[key] = {
+            [Op.iLike]: `%${filter[key]}%`
+          }
+        }        
       } 
     }
 
@@ -89,7 +105,11 @@ class BaseController {
     let order = []
 
     if (orderby && ordertype) {
-      order.push([orderby, ordertype])
+      if(this.sortable.includes(orderby)) {
+        order.push([orderby, ordertype])
+      }
+    } else {
+      order.push(['updatedAt', 'DESC'])
     }
 
     return order
