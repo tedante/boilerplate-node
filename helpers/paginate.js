@@ -1,5 +1,3 @@
-// create helper for pagination
-// Path: helpers/paginate.js
 module.exports = async (model, pageQuery, limitQuery, options) => {
   const page = parseInt(pageQuery) || 1;
   const limit = parseInt(limitQuery) || 10;
