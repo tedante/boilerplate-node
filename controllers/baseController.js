@@ -1,5 +1,6 @@
 const responseHelper = require('../helpers/response')
 const paginate = require('../helpers/paginate')
+const { Op } = require('sequelize')
 
 class BaseController {
   constructor(model) {
@@ -10,7 +11,8 @@ class BaseController {
     let { page, limit, filter, orderby, ordertype } = req.query
 
     let params = {
-      order: this.getOrder(orderby, ordertype)
+      order: this.getOrder(orderby, ordertype),
+      where: this.getFilter(filter)
     }
 
     try {
@@ -74,13 +76,13 @@ class BaseController {
     let sequelizeFilter = {}
 
     if (filter) {
-      let filterArray = filter.split(',')
+      // filter is object with name column and filter value, format to filter ilike %value%
+      for (const key in filter) {
+        sequelizeFilter[key] = {
+          [Op.iLike]: `%${filter[key]}%`
+        }
+      } 
 
-      filterArray.forEach((item) => {
-        let filterItem = item.split(':')
-
-        sequelizeFilter[filterItem[0]] = filterItem[1]
-      })
     }
 
     return sequelizeFilter
