@@ -1,9 +1,22 @@
-const { error } = require('../helpers/responseHelper')
 const errorHandler = require('../helpers/errorHandler')
+
+const getBearerToken = (headers) => {
+  const bearerHeader = headers['authorization']
+
+  if (typeof bearerHeader !== 'undefined') {
+    const bearerToken = bearerHeader.split(' ')[1]
+
+    return bearerToken
+  } else {
+    return null
+  }
+}
 
 module.exports = {
   isLogin: (req, res, next) => {
-    if (req.session.isLogin) {
+    let token = getBearerToken(req.headers)
+    if (token) {
+      req.token = token
       next()
     } else {
       errorHandler({
@@ -13,7 +26,9 @@ module.exports = {
     }
   },
   isNotLogin: (req, res, next) => {
-    if (!req.session.isLogin) {
+    let token = getBearerToken(req.headers)
+    if (!token) {
+      req.token = token
       next()
     } else {
       errorHandler({
