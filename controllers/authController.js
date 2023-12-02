@@ -60,6 +60,19 @@ class AuthController extends BaseController{
         });
       }
 
+      const findExistUser = await this.model.findOne({
+        where: {
+          email: email
+        },
+      });
+
+      if (findExistUser) {
+        throw ({
+          name: "BAD_REQUEST",
+          message: "Email already exists",
+        });
+      }
+
       const user = await this.model.create({
         name,
         email,
