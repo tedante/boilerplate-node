@@ -2,6 +2,10 @@
 const {
   Model
 } = require('sequelize');
+const { hash, compare } = require("../helpers/bcrypt");
+const { generateJWT } = require("../helpers/jwt");
+const { v4: uuidv4 } = require('uuid');
+
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     /**
@@ -10,8 +14,22 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      User.belongsTo(models.Role, {
+        foreignKey: "RoleId",
+      })
     }
+
+    validPassword(password) {
+      return compare(password, this.password);
+    }
+
+    generateToken() {
+      return generateJWT({
+        id: this.id,
+        email: this.email,
+      });
+    }
+
   }
   User.init({
     id: {
@@ -23,8 +41,14 @@ module.exports = (sequelize, DataTypes) => {
     email: DataTypes.STRING,
     password: DataTypes.STRING,
     email_verified_at: DataTypes.DATE,
+    RoleId: DataTypes.UUID,
     is_active: DataTypes.BOOLEAN
   }, {
+    hooks: {
+      beforeCreate: (user) => {
+        user.password = hash(user.password);
+      },
+    },
     sequelize,
     modelName: 'User',
     paranoid: true,

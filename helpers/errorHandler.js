@@ -19,8 +19,21 @@ module.exports = (err, req, res, next) => {
         message: err.message || "Bad request",
       };
       break;
+    case "NOT_AUTHORIZED":
+      error = {
+        code: 401,
+        message: err.message || "You are not authorized",
+      };
+      break;
+    case "FORBIDDEN":
+      error = {
+        code: 403,
+        message: err.message || "Forbidden",
+      };
+      break;
     default:
   }
+  
   const response = responseHelper.error(null, error.message, error.code);
   res.status(response.code).json(response);
 };

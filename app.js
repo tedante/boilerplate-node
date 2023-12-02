@@ -22,6 +22,4 @@ app.use(express.json());
 app.use(limiter)
 app.use("/", routes);
 
-app.listen(PORT, () => {
-  console.log(`App listening on port ${PORT}`);
-})
+module.exports = app

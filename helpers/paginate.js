@@ -1,6 +1,4 @@
-// create helper for pagination
-// Path: helpers/paginate.js
-module.exports = async (model, pageQuery, limitQuery, searchQuery) => {
+module.exports = async (model, pageQuery, limitQuery, options) => {
   const page = parseInt(pageQuery) || 1;
   const limit = parseInt(limitQuery) || 10;
   const startIndex = (page - 1) * limit;
@@ -29,12 +27,12 @@ module.exports = async (model, pageQuery, limitQuery, searchQuery) => {
   results.meta.limit = limit;
   results.meta.totalPages = totalPages;
 
+  let params = options
+  params.offset = startIndex
+  params.limit = limit
+
   try {
-    results.data = await model.findAll({
-      offset: startIndex,
-      limit: limit,
-      where: searchQuery,
-    })
+    results.data = await model.findAll(params)
     
     return results;
   } catch (e) {

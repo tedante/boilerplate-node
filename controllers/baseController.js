@@ -1,16 +1,37 @@
 const responseHelper = require('../helpers/response')
 const paginate = require('../helpers/paginate')
+const { Op } = require('sequelize')
 
 class BaseController {
   constructor(model) {
     this.model = model
   }
 
+  get filterable() {
+    return []
+  }
+
+  get sortable() {
+    return []
+  }
+
+  get includable() {
+    return []
+  }
+
   list = async (req, res, next) => {
-    let { page, limit, search } = req.query
+    let { page, limit, filter, orderby, ordertype, include } = req.query
 
     try {
-      const data = await paginate(this.model, page, limit, search)
+      let params = {
+        order: this.getOrder(orderby, ordertype),
+        where: this.getFilter(filter),
+        include: this.getInclude(include)
+      }
+
+      console.log(params, ">>");
+
+      const data = await paginate(this.model, page, limit, params)
       
       let responseSuccess = responseHelper.success(data.data, 'Data successfully retrieved', 200, data.meta)
       
@@ -63,6 +84,55 @@ class BaseController {
     } catch (error) {
       next(error)
     }
+  }
+
+  getFilter = (filter) => {
+    let sequelizeFilter = {}
+
+    if (filter) {
+      for (const key in filter) {
+        if(this.filterable.includes(key)) {
+          sequelizeFilter[key] = {
+            [Op.iLike]: `%${filter[key]}%`
+          }
+        }        
+      } 
+    }
+
+    return sequelizeFilter
+  }
+
+  getOrder = (orderby, ordertype) => {
+    let order = []
+
+    if (orderby && ordertype) {
+      if(this.sortable.includes(orderby)) {
+        order.push([orderby, ordertype])
+      }
+    } else {
+      order.push(['updatedAt', 'DESC'])
+    }
+
+    return order
+  }
+  
+  getInclude = (include) => {
+    let sequelizeInclude = []
+    
+    if (include && include.length > 0) {
+      include.forEach(element => {
+        
+        this.includable.forEach(item => {
+          if (item.name === element) {
+            sequelizeInclude.push({
+              model: item
+            })
+          }
+        })
+      });
+    }
+
+    return sequelizeInclude
   }
 }
 

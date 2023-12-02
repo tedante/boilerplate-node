@@ -4,20 +4,15 @@
 module.exports = {
   async up (queryInterface, Sequelize) {
    // create bulk insert data to table role
-    await queryInterface.bulkInsert('Roles', [
-      {
-        name: 'admin',
-        description: 'Administrator',
+    let roles = require('./data/roles.json').map(role => {
+      return {
+        ...role,
         createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        name: 'user',
-        description: 'User',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        updatedAt: new Date()
       }
-    ]);
+    })
+
+    await queryInterface.bulkInsert('Roles', roles, {});
   },
 
   async down (queryInterface, Sequelize) {
