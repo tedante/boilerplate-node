@@ -4,7 +4,7 @@
   "description": "This is an boilerplate for fullstack nodejs project. A template for starting project with MVC pattern and some package like express, sequelize, ejs, etc.",
   "main": "app.js",
   "scripts": {
-    "test": "jest --watchAll --verbose",
+    "test": "NODE_ENV=test jest --watchAll --verbose --runInBand",
     "dev": "npx nodemon bin/www"
   },
   "keywords": [],
