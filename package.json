@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "test": "jest --watchAll --verbose",
-    "dev": "npx nodemon app.js"
+    "dev": "npx nodemon bin/www"
   },
   "keywords": [],
   "author": "tedante",
