@@ -4,15 +4,17 @@
   "description": "This is an boilerplate for fullstack nodejs project. A template for starting project with MVC pattern and some package like express, sequelize, ejs, etc.",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --watchAll --verbose",
     "dev": "npx nodemon app.js"
   },
   "keywords": [],
   "author": "tedante",
   "license": "ISC",
   "devDependencies": {
+    "jest": "^29.7.0",
     "nodemon": "^2.0.22",
-    "sequelize-cli": "^6.6.1"
+    "sequelize-cli": "^6.6.1",
+    "supertest": "^6.3.3"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
