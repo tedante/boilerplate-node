@@ -93,6 +93,7 @@ describe('Roles API', () => {
   
   test('Should get roles with name filter', () => {
     let filter = "admin"
+    
     return request(app)
             .get(prefix + `?filter[name]=${filter}`)
             .set('Authorization', `Bearer ${accessToken}`)
