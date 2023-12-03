@@ -15,6 +15,10 @@ class BaseController {
     return []
   }
 
+  get attributes() {
+    return []
+  }
+
   get includable() {
     return []
   }
@@ -26,7 +30,11 @@ class BaseController {
       let params = {
         order: this.getOrder(orderby, ordertype),
         where: this.getFilter(filter),
-        include: this.getInclude(include)
+        include: this.getInclude(include),
+      }
+      
+      if (this.attributes.length > 0) {
+        params.attributes = this.attributes
       }
 
       const data = await paginate(this.model, page, limit, params)
@@ -35,6 +43,7 @@ class BaseController {
       
       res.status(responseSuccess.code).json(responseSuccess)
     } catch (error) {
+      console.log(error);
       next(error)
     }
   }
