@@ -1,6 +1,6 @@
 const request = require('supertest');
 const app = require('../app');
-const syncDatabase = require('./syncDatabase');
+const syncDatabase = require('./database');
 
 beforeAll(async () => {
   await syncDatabase.sync()
