@@ -1,14 +1,15 @@
 const request = require('supertest');
 const app = require('../app');
+const syncDatabase = require('./syncDatabase');
 
 beforeAll(async () => {
-  await require('./syncDatabase').sync()
+  await syncDatabase.sync()
 
-  await require('./syncDatabase').seed()
+  await syncDatabase.seed()
 })
 
 afterAll(async () => {
-  await require('./syncDatabase').clean()
+  await syncDatabase.clean()
 });
 
 describe('Auth API', () => {
