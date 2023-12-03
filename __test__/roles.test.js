@@ -20,6 +20,7 @@ describe('Roles API', () => {
     id: admin.id,
     email: admin.email,
   });
+  const roles = require('../seeders/data/roles.json');
   
   test('check server active', () => {
     return request(app)
@@ -30,19 +31,6 @@ describe('Roles API', () => {
             })
   })
 
-  test('Should get all roles', () => {
-    return request(app)
-            .get(prefix)
-            .set('Authorization', `Bearer ${accessToken}`)
-            .expect(200)
-            .then(({status, body}) => {
-              expect(status).toBe(200);
-              expect(body).toBeInstanceOf(Object);
-              expect(body.data).toBeInstanceOf(Array);
-              expect(body.data.length).toBeGreaterThan(0);
-            })
-  })
-  
   test('Should not get all roles without access token', () => {
     return request(app)
             .get(prefix)
@@ -65,6 +53,59 @@ describe('Roles API', () => {
               expect(body).toBeInstanceOf(Object);
               expect(body.code).toBe(401);
               expect(body.message).toBe('NOT_AUTHORIZED');
+            })
+  })
+
+  test('Should get all roles', () => {
+    return request(app)
+            .get(prefix)
+            .set('Authorization', `Bearer ${accessToken}`)
+            .expect(200)
+            .then(({status, body}) => {
+              expect(status).toBe(200);
+              expect(body).toBeInstanceOf(Object);
+              expect(body.data).toBeInstanceOf(Array);
+              expect(body.meta.next).toBe(null);
+              expect(body.meta.previous).toBe(null);
+              expect(body.meta.page).toBe(1);
+              expect(body.meta.total).toBe(2);
+              expect(body.meta.limit).toBe(10);
+              expect(body.meta.totalPages).toBe(1);
+            })
+  })
+  test('Should get roles with limit 1', () => {
+    return request(app)
+            .get(prefix + '?limit=1')
+            .set('Authorization', `Bearer ${accessToken}`)
+            .expect(200)
+            .then(({status, body}) => {
+              expect(status).toBe(200);
+              expect(body).toBeInstanceOf(Object);
+              expect(body.data).toBeInstanceOf(Array);
+              expect(body.meta.next).toBe(2);
+              expect(body.meta.previous).toBe(null);
+              expect(body.meta.page).toBe(1);
+              expect(body.meta.total).toBe(2);
+              expect(body.meta.limit).toBe(1);
+              expect(body.meta.totalPages).toBe(2);
+            })
+  })
+  
+  test('Should get roles with name filter', () => {
+    return request(app)
+            .get(prefix + '?filter[name]=admin')
+            .set('Authorization', `Bearer ${accessToken}`)
+            .expect(200)
+            .then(({status, body}) => {
+              expect(status).toBe(200);
+              expect(body).toBeInstanceOf(Object);
+              expect(body.data).toBeInstanceOf(Array);
+              expect(body.meta.next).toBe(null);
+              expect(body.meta.previous).toBe(null);
+              expect(body.meta.page).toBe(1);
+              expect(body.meta.total).toBe(1);
+              expect(body.meta.limit).toBe(10);
+              expect(body.meta.totalPages).toBe(1);
             })
   })
 })
