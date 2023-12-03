@@ -41,6 +41,13 @@ afterAll(async () => {
 });
 
 describe('Auth API', () => {
+
+  let requestRegister = {
+    "name": "testregister",
+    "email": "testregister@yopmail.com",
+    "password": "testtest"
+  }
+
   test('check server active', () => {
     return request(app)
             .get('/ping')
@@ -51,36 +58,30 @@ describe('Auth API', () => {
   })
 
   test('Should register a new user', () => {
-    let requestBody = {
-      "name": "testregister",
-      "email": "testregister@yopmail.com",
-      "password": "testtest"
-    }
 
     return request(app)
             .post('/auth/register')
-            .send(requestBody)
+            .send(requestRegister)
             .expect(201)
             .then(({status, body}) => {
               expect(status).toBe(201);
-              expect(body.data).toHaveProperty('email', requestBody.email);
+              expect(body).toBeInstanceOf(Object);
+              expect(body.data).toHaveProperty('email', requestRegister.email);
             })
   })
 
   test('Should not register a new user with existing email', () => {
-    let requestBody = {
-      "name": "testregister",
-      "email": "testregister@yopmail.com",
-      "password": "testtest"
-    }
-
     return request(app)
             .post('/auth/register')
-            .send(requestBody)
+            .send(requestRegister)
             .expect(400)
             .then(({status, body}) => {
               expect(status).toBe(400);
-              expect(body.message).toBe('Email already exists');
+              expect(body).toBeInstanceOf(Object);
+              expect(body.code).toBe(400);
+              expect(body.message).toBe('BAD_REQUEST');
+              expect(body.errors).toBeInstanceOf(Object);
+              expect(body.errors.email).toContain('email has already been used');
             })
   })
 });
