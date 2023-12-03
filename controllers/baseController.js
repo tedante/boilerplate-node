@@ -29,15 +29,12 @@ class BaseController {
         include: this.getInclude(include)
       }
 
-      console.log(params, ">>");
-
       const data = await paginate(this.model, page, limit, params)
       
       let responseSuccess = responseHelper.success(data.data, 'Data successfully retrieved', 200, data.meta)
       
       res.status(responseSuccess.code).json(responseSuccess)
     } catch (error) {
-      console.log(error);
       next(error)
     }
   }
