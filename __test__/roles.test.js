@@ -68,7 +68,7 @@ describe('Roles API', () => {
               expect(body.meta.next).toBe(null);
               expect(body.meta.previous).toBe(null);
               expect(body.meta.page).toBe(1);
-              expect(body.meta.total).toBe(2);
+              expect(body.meta.total).toBe(roles.length);
               expect(body.meta.limit).toBe(10);
               expect(body.meta.totalPages).toBe(1);
             })
@@ -85,15 +85,16 @@ describe('Roles API', () => {
               expect(body.meta.next).toBe(2);
               expect(body.meta.previous).toBe(null);
               expect(body.meta.page).toBe(1);
-              expect(body.meta.total).toBe(2);
+              expect(body.meta.total).toBe(roles.length);
               expect(body.meta.limit).toBe(1);
-              expect(body.meta.totalPages).toBe(2);
+              expect(body.meta.totalPages).toBe(roles.length);
             })
   })
   
   test('Should get roles with name filter', () => {
+    let filter = "admin"
     return request(app)
-            .get(prefix + '?filter[name]=admin')
+            .get(prefix + `?filter[name]=${filter}`)
             .set('Authorization', `Bearer ${accessToken}`)
             .expect(200)
             .then(({status, body}) => {
@@ -103,7 +104,7 @@ describe('Roles API', () => {
               expect(body.meta.next).toBe(null);
               expect(body.meta.previous).toBe(null);
               expect(body.meta.page).toBe(1);
-              expect(body.meta.total).toBe(1);
+              expect(body.meta.total).toBe(roles.filter(r => r.name === filter).length);
               expect(body.meta.limit).toBe(10);
               expect(body.meta.totalPages).toBe(1);
             })
