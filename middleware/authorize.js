@@ -1,4 +1,5 @@
 const errorHandler = require('../helpers/errorHandler')
+const verify = require('../helpers/jwt').verify
 
 const getBearerToken = (headers) => {
   const bearerHeader = headers['authorization']
@@ -14,14 +15,25 @@ const getBearerToken = (headers) => {
 
 module.exports = {
   isLogin: (req, res, next) => {
-    let token = getBearerToken(req.headers)
-    if (token) {
-      req.token = token
+    try {
+      let token = getBearerToken(req.headers)
+
+      if(!token) throw ({
+        errors: {
+          token: ['bearer token is required']
+        }
+      })
+
+      const decoded = verify(token);
+
+      req.user = decoded
       next()
-    } else {
+    } catch (error) {
       errorHandler({
         name: 'NOT_AUTHORIZED',
-        message: 'You are not authorized'
+        errors: error.errors || {
+          token: error.message
+        }
       }, req, res, next)
     }
   },
@@ -33,7 +45,6 @@ module.exports = {
     } else {
       errorHandler({
         name: 'FORBIDDEN',
-        message: 'Forbidden'
       }, req, res, next)
     }
   }

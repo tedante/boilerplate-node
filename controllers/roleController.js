@@ -10,6 +10,10 @@ class RoleController extends BaseController {
     return ['name']
   }
 
+  get attributes() {
+    return ['id', 'name', 'updatedAt']
+  }
+
   get sortable() {
     return ['name', 'createdAt', 'updatedAt']
   }

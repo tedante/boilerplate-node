@@ -1,46 +1,24 @@
 const request = require('supertest');
 const app = require('../app');
-const { User, sequelize } = require('../models');
+const syncDatabase = require('./database');
 
 beforeAll(async () => {
-  await sequelize.sync({ force: true });
-  
-  let roles = require('../seeders/data/roles.json').map(role => {
-    return {
-      ...role,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    }
-  })
+  await syncDatabase.sync()
 
-  await sequelize.queryInterface.bulkInsert('Roles', roles, {});
-
-  let users = require('../seeders/data/users.json').map(user => {
-    return {
-      ...user,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    }
-  })
-  
-  await sequelize.queryInterface.bulkInsert('Users', users, {});
+  await syncDatabase.seed()
 })
 
 afterAll(async () => {
-  await sequelize.queryInterface.bulkDelete("Roles", null, {
-    restartIdentity: true,
-    cascade: true,
-    truncate: true,
-  });
-
-  await sequelize.queryInterface.bulkDelete("Users", null, {
-    restartIdentity: true,
-    cascade: true,
-    truncate: true,
-  });
+  await syncDatabase.clean()
 });
 
 describe('Auth API', () => {
+  let requestRegister = {
+    "name": "testregister",
+    "email": "testregister@yopmail.com",
+    "password": "testtest"
+  }
+
   test('check server active', () => {
     return request(app)
             .get('/ping')
@@ -51,36 +29,30 @@ describe('Auth API', () => {
   })
 
   test('Should register a new user', () => {
-    let requestBody = {
-      "name": "testregister",
-      "email": "testregister@yopmail.com",
-      "password": "testtest"
-    }
 
     return request(app)
             .post('/auth/register')
-            .send(requestBody)
+            .send(requestRegister)
             .expect(201)
             .then(({status, body}) => {
               expect(status).toBe(201);
-              expect(body.data).toHaveProperty('email', requestBody.email);
+              expect(body).toBeInstanceOf(Object);
+              expect(body.data).toHaveProperty('email', requestRegister.email);
             })
   })
 
   test('Should not register a new user with existing email', () => {
-    let requestBody = {
-      "name": "testregister",
-      "email": "testregister@yopmail.com",
-      "password": "testtest"
-    }
-
     return request(app)
             .post('/auth/register')
-            .send(requestBody)
+            .send(requestRegister)
             .expect(400)
             .then(({status, body}) => {
               expect(status).toBe(400);
-              expect(body.message).toBe('Email already exists');
+              expect(body).toBeInstanceOf(Object);
+              expect(body.code).toBe(400);
+              expect(body.message).toBe('BAD_REQUEST');
+              expect(body.errors).toBeInstanceOf(Object);
+              expect(body.errors.email).toContain('email has already been used');
             })
   })
 });
