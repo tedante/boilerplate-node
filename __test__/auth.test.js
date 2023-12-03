@@ -1,47 +1,17 @@
 const request = require('supertest');
 const app = require('../app');
-const { User, sequelize } = require('../models');
 
 beforeAll(async () => {
-  await sequelize.sync({ force: true });
-  
-  let roles = require('../seeders/data/roles.json').map(role => {
-    return {
-      ...role,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    }
-  })
+  await require('./syncDatabase').sync()
 
-  await sequelize.queryInterface.bulkInsert('Roles', roles, {});
-
-  let users = require('../seeders/data/users.json').map(user => {
-    return {
-      ...user,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    }
-  })
-  
-  await sequelize.queryInterface.bulkInsert('Users', users, {});
+  await require('./syncDatabase').seed()
 })
 
 afterAll(async () => {
-  await sequelize.queryInterface.bulkDelete("Roles", null, {
-    restartIdentity: true,
-    cascade: true,
-    truncate: true,
-  });
-
-  await sequelize.queryInterface.bulkDelete("Users", null, {
-    restartIdentity: true,
-    cascade: true,
-    truncate: true,
-  });
+  await require('./syncDatabase').clean()
 });
 
 describe('Auth API', () => {
-
   let requestRegister = {
     "name": "testregister",
     "email": "testregister@yopmail.com",
