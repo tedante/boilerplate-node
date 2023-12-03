@@ -7,25 +7,7 @@ module.exports = async (model, pageQuery, limitQuery, options) => {
     data: [],
     meta: {},
   };
-  const total = await model.count();
-  const totalPages = Math.ceil(total / limit);
 
-  if (endIndex < total) {
-    results.meta.next = page + 1;
-  } else {
-    results.meta.next = null;
-  }
-
-  if (startIndex > 0) {
-    results.meta.previous = page - 1;
-  } else {
-    results.meta.previous = null;
-  }
-
-  results.meta.page = page;
-  results.meta.total = total;
-  results.meta.limit = limit;
-  results.meta.totalPages = totalPages;
 
   let params = options
   params.offset = startIndex
@@ -33,9 +15,34 @@ module.exports = async (model, pageQuery, limitQuery, options) => {
 
   try {
     results.data = await model.findAll(params)
+
+    let total = await model.count();
+
+    if(params.where) {
+      total = await model.count({ where: params.where });
+    }
+
+    const totalPages = Math.ceil(total / limit);
+
+    if (endIndex < total) {
+      results.meta.next = page + 1;
+    } else {
+      results.meta.next = null;
+    }
+
+    if (startIndex > 0) {
+      results.meta.previous = page - 1;
+    } else {
+      results.meta.previous = null;
+    }
+
+    results.meta.page = page;
+    results.meta.total = total;
+    results.meta.limit = limit;
+    results.meta.totalPages = totalPages;
     
     return results;
   } catch (e) {
-    return e;
+    throw e;
   }
 }
