@@ -69,7 +69,9 @@ class AuthController extends BaseController{
       if (findExistUser) {
         throw ({
           name: "BAD_REQUEST",
-          message: "Email already exists",
+          errors: {
+            email: ["email has already been used"]
+          },
         });
       }
 
@@ -90,7 +92,6 @@ class AuthController extends BaseController{
       
       return res.status(response.code).json(response);
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }
